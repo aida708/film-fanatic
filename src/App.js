@@ -11,6 +11,7 @@ import { WatchedMovieList } from "./components/WatchedMovieList";
 import { WatchedSummary } from "./components/WatchedSummary";
 import MovieDetails from "./components/MovieDetails";
 import Loader from "./components/Loader";
+import { useMovies } from "./components/useMovies";
 
 export const tempMovieData = [
   {
@@ -59,27 +60,17 @@ export const tempWatchedData = [
   },
 ];
 
-const KEY = "f79045e6";
 export const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
+// const KEY = "f79045e6";
+
 export default function App() {
   const [query, setQuery] = useState("");
-  const [movies, setMovies] = useState(tempMovieData);
-  const [watched, setWatched] = useState(tempWatchedData);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState(null);
+  const [watched, setWatched] = useState(tempWatchedData);
 
-  // useEffect(function () {
-  //   console.log("after initial render");
-  // }, []);
-
-  // useEffect(function () {
-  //   console.log("after evry render");
-  // });
-
-  // console.log("DURING RENDER");
+  const { movies, isLoading, error } = useMovies(query, handleCloseMovie);
 
   function handleSelectMovie(id) {
     setSelectedId((selectedId) => (id === selectedId ? null : id));
@@ -103,53 +94,6 @@ export default function App() {
   useEffect(function () {}, [watched]);
 
   //useEffect to globally listen to a keypress: esc
-
-  useEffect(
-    function () {
-      const controller = new AbortController();
-
-      async function fetchMovies() {
-        try {
-          setIsLoading(true);
-          setError("");
-
-          const res = await fetch(
-            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
-            { signal: controller.signal }
-          );
-
-          if (!res.ok) throw new Error("Something went wrong");
-
-          const data = await res.json();
-          if (data.Response === "False") throw new Error("movie not found ");
-
-          setMovies(data.Search);
-        } catch (err) {
-          console.log(err.message);
-          setError(err.message);
-
-          if (err.name !== "AbortError") {
-            setError(err.message);
-          }
-        } finally {
-          setIsLoading(false);
-        }
-      }
-
-      if (query.length < 3) {
-        setMovies([]);
-        setError("");
-        return;
-      }
-      handleCloseMovie();
-      fetchMovies();
-
-      return function () {
-        controller.abort();
-      };
-    },
-    [query]
-  );
 
   return (
     <>
