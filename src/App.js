@@ -12,6 +12,7 @@ import { WatchedSummary } from "./components/WatchedSummary";
 import MovieDetails from "./components/MovieDetails";
 import Loader from "./components/Loader";
 import { useMovies } from "./components/useMovies";
+import { useLocalStorageState } from "./components/useLocalStorageState";
 
 export const tempMovieData = [
   {
@@ -68,7 +69,8 @@ export const average = (arr) =>
 export default function App() {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null);
-  const [watched, setWatched] = useState(tempWatchedData);
+
+  const [watched, setWatched] = useLocalStorageState([], "watched");
 
   const { movies, isLoading, error } = useMovies(query, handleCloseMovie);
 
@@ -90,8 +92,6 @@ export default function App() {
   function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
-
-  useEffect(function () {}, [watched]);
 
   //useEffect to globally listen to a keypress: esc
 
