@@ -1,38 +1,50 @@
-import { useEffect, useState } from "react";
+// const KEY = "b2453ff5";
 
-const KEY = "f79045e6";
+import { useEffect, useState } from "react";
 
 export function useMovies(query) {
   const [movies, setMovies] = useState([]);
-
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const KEY = "53751975";
+
   useEffect(
     function () {
+      // cleaning data fetched
       const controller = new AbortController();
 
       async function fetchMovies() {
         try {
+          // set preloader
           setIsLoading(true);
+
+          // reset errors
           setError("");
 
+          // fetch API
           const res = await fetch(
-            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+            `https://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
             { signal: controller.signal }
           );
 
-          if (!res.ok) throw new Error("Something went wrong");
+          // failed fetch, throw an error
+          if (!res.ok) throw new Error("Failed to fetch, Please Try Again");
 
+          // assign fetched results
           const data = await res.json();
-          if (data.Response === "False") throw new Error("movie not found ");
 
+          // results not found, throw an error
+          if (data.Response === "False") throw new Error("Movie Not Found!");
+
+          // input results into movie state
           setMovies(data.Search);
-        } catch (err) {
-          console.log(err.message);
-          setError(err.message);
 
-          if (err.name !== "AbortError") {
+          // reset errors
+          setError("");
+        } catch (err) {
+          /* Set the error message into a State */
+          if (err.message !== "The user aborted a request.") {
             setError(err.message);
           }
         } finally {
@@ -40,14 +52,16 @@ export function useMovies(query) {
         }
       }
 
-      if (query.length < 3) {
+      // empty query
+      if (!query.length) {
         setMovies([]);
         setError("");
         return;
       }
-      //   handleCloseMovie();
+
       fetchMovies();
 
+      // cleaning asyncData
       return function () {
         controller.abort();
       };

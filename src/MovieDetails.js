@@ -1,8 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
-import StarRating from "./StarRating";
+import { useEffect, useRef, useState } from "react";
+
+import { useKey } from "./hooks/useKey";
+
 import Loader from "./Loader";
-import { useKey } from "./useKey";
-const KEY = "f79045e6";
+import StarRating from "./StarRating";
+
+const KEY = "b2453ff5";
 
 export default function MovieDetails({
   selectedId,
@@ -14,11 +17,11 @@ export default function MovieDetails({
   const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating] = useState("");
 
-  const countRef = useRef(0); //Doesnt cause re-render
+  const countRef = useRef(0);
 
   useEffect(
     function () {
-      if (userRating) countRef.current++;
+      if (userRating) countRef.current = countRef.current + 1;
     },
     [userRating]
   );
@@ -46,6 +49,7 @@ export default function MovieDetails({
       imdbID: selectedId,
       title,
       year,
+      poster,
       imdbRating: Number(imdbRating),
       runtime: Number(runtime.split(" ").at(0)),
       userRating,
@@ -54,7 +58,6 @@ export default function MovieDetails({
     onAddWatched(newWatchedMovie);
     onCloseMovie();
   }
-  //useEffect to globally listen to a keypress: esc
 
   useKey("Escape", onCloseMovie);
 
@@ -63,7 +66,7 @@ export default function MovieDetails({
       async function getMovieDetails() {
         setIsLoading(true);
         const res = await fetch(
-          `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`
+          `https://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`
         );
         const data = await res.json();
         setMovie(data);
@@ -79,9 +82,8 @@ export default function MovieDetails({
       if (!title) return;
       document.title = `Movie | ${title}`;
 
-      //clean up function to return the title to film fanatic
       return function () {
-        document.title = "Film Fanatic";
+        document.title = "usePopcorn";
       };
     },
     [title]
@@ -94,11 +96,10 @@ export default function MovieDetails({
       ) : (
         <>
           <header>
-            <button className="btn-back" onClick={() => onCloseMovie()}>
+            <button className="btn-back" onClick={onCloseMovie}>
               &larr;
             </button>
-            <img src={poster} alt={`Poster of ${movie} movie`} />
-
+            <img src={poster} alt={`Poster of ${title} movie`} />
             <div className="details-overview">
               <h2>{title}</h2>
               <p>
@@ -107,11 +108,11 @@ export default function MovieDetails({
               <p>{genre}</p>
               <p>
                 <span>⭐</span>
-                {imdbRating} IMDb Rating
+                {imdbRating} IMDb rating
               </p>
             </div>
           </header>
-
+          {/* <p>{avgRating}</p> */}
           <section>
             <div className="rating">
               {!isWatched ? (
@@ -123,18 +124,17 @@ export default function MovieDetails({
                   />
                   {userRating > 0 && (
                     <button className="btn-add" onClick={handleAdd}>
-                      {" "}
-                      +Add to list
+                      + Add to list
                     </button>
                   )}
                 </>
               ) : (
                 <p>
-                  You rated this movie {watchedUserRating}
-                  <span>⭐</span>
+                  You rated this movie {watchedUserRating} <span>⭐</span>
                 </p>
               )}
             </div>
+
             <p>
               <em>{plot}</em>
             </p>
