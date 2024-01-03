@@ -7,7 +7,7 @@ In my pursuit of mastering React, I undertook the task of creating a Movie Detai
 4. Average Ratings: See the average ratings of the movies in your watchlist.
 
 🌐 Check it out live: https://film-fanatic-aidaa.netlify.app/
-🔧 GitHub Repository: https://github.com/aida708/film-fanatic/edit/master/
+🔧 GitHub Repository: https://github.com/aida708/film-fanatic
 
 👨‍💻 Key Learnings:
 
